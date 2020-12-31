@@ -5,32 +5,10 @@ namespace Quidco\DbSampler\Tests\Collection;
 use Quidco\DbSampler\Collection\TableCollection;
 use PHPUnit\Framework\TestCase;
 use Quidco\DbSampler\Configuration\MigrationConfiguration;
-use Quidco\DbSampler\Sampler\Matched;
-use Quidco\DbSampler\Sampler\NewestById;
 
 class TableCollectionTest extends TestCase
 {
-    public function testItThrowsAnExceptionWithAnUnknownSampler(): void
-    {
-        $fruits = [
-            "sampler" => "invalidsampler",
-        ];
-
-        $config = MigrationConfiguration::fromJson(\json_encode([
-            'name' => 'test-migration',
-            "tables" => [
-                "fruits" => $fruits
-            ]
-        ]));
-
-        $tableCollection = TableCollection::fromConfig($config);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unrecognised sampler type \'invalidsampler\' required');
-        $tableCollection->getTables();
-    }
-
-    public function testItCreatesTheCorrectSamplerConfig(): void
+    public function testItReturnsTheListOfTables(): void
     {
         $fruits = [
             "sampler" => "matched",
@@ -61,7 +39,20 @@ class TableCollectionTest extends TestCase
 
         $tableCollection = TableCollection::fromConfig($config);
 
-        $this->assertInstanceOf(Matched::class, $tableCollection->getTables()['fruits']);
-        $this->assertInstanceOf(NewestById::class, $tableCollection->getTables()['vegetables']);
+        $this->assertEquals([
+            'fruits' => $fruits,
+            'vegetables' => $vegetables,
+        ], \json_decode(\json_encode($tableCollection->getTables()), true));
+    }
+
+    public function testTablesAreNotOptional(): void
+    {
+        $config = MigrationConfiguration::fromJson(\json_encode([
+            'name' => 'test-migration'
+        ]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('No table config was defined');
+        TableCollection::fromConfig($config);
     }
 }

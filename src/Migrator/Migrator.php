@@ -4,8 +4,14 @@ namespace Quidco\DbSampler\Migrator;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
+use Quidco\DbSampler\Cleaner\FieldCleaner;
+use Quidco\DbSampler\Cleaner\RowCleaner;
 use Quidco\DbSampler\Collection\TableCollection;
 use Quidco\DbSampler\Collection\ViewCollection;
+use Quidco\DbSampler\ReferenceStore;
+use Quidco\DbSampler\Sampler\Sampler;
+use Quidco\DbSampler\SamplerMap\SamplerMap;
+use Quidco\DbSampler\Writer\Writer;
 
 /**
  * Migrator class to handle all migrations in a set
@@ -27,6 +33,13 @@ class Migrator
      */
     private $destConnection;
 
+    /**
+     * @var ReferenceStore
+     */
+    private $referenceStore;
+
+    private $customCleaners = [];
+
 
     public function __construct(
         Connection $sourceConnection,
@@ -36,6 +49,7 @@ class Migrator
         $this->sourceConnection = $sourceConnection;
         $this->destConnection = $destConnection;
         $this->logger = $logger;
+        $this->referenceStore = new ReferenceStore();
     }
 
     /**
@@ -45,14 +59,28 @@ class Migrator
      */
     public function execute(string $setName, TableCollection $tableCollection, ViewCollection $viewCollection): void
     {
-        foreach ($tableCollection->getTables() as $table => $sampler) {
+        foreach ($tableCollection->getTables() as $table => $migrationSpec) {
+            // @todo: it'd probably be better to have a proper `migrationspec` config object
+            // rather than relying on properties being present in the json / stdClass object
+
+            $sampler = $this->buildTableSampler($migrationSpec, $table);
+            $writer = new Writer($migrationSpec, $this->destConnection);
+            $cleaner = new RowCleaner($migrationSpec);
+
+            foreach ($this->customCleaners as $alias => $customCleaner) {
+                $cleaner->registerCleaner($customCleaner, $alias);
+            }
+
             try {
                 $this->ensureEmptyTargetTable($table, $this->sourceConnection, $this->destConnection);
-                $sampler->setTableName($table);
-                $sampler->setSourceConnection($this->sourceConnection);
-                $sampler->setDestConnection($this->destConnection);
                 $rows = $sampler->execute();
-                $this->logger->info("$setName: migrated '$table' with '" . $sampler->getName() . "': $rows rows");
+
+                foreach ($rows as $row) {
+                    $writer->write($table, $cleaner->cleanRow($row));
+                }
+                $writer->postWrite();
+
+                $this->logger->info("$setName: migrated '$table' with '" . $sampler->getName() . "': " . \count($rows) . " rows");
             } catch (\Exception $e) {
                 $this->logger->error(
                     "$setName: failed to migrate '$table' with '" . $sampler->getName() . "': " . $e->getMessage()
@@ -68,6 +96,10 @@ class Migrator
         $this->migrateTableTriggers($setName, $tableCollection);
     }
 
+    public function registerCustomCleaner(FieldCleaner $cleaner, string $alias): void
+    {
+        $this->customCleaners[$alias] = $cleaner;
+    }
 
     /**
      * Ensure that the specified table is present in the destination DB as an empty copy of the source
@@ -109,7 +141,7 @@ class Migrator
      */
     private function migrateTableTriggers(string $setName, TableCollection $tableCollection): void
     {
-        foreach ($tableCollection->getTables() as $table => $sampler) {
+        foreach ($tableCollection->getTables($this->referenceStore) as $table => $sampler) {
             try {
                 $triggerSql = $this->generateTableTriggerSql($table, $this->sourceConnection);
                 foreach ($triggerSql as $sql) {
@@ -204,5 +236,32 @@ class Migrator
         $destConnection->exec($createSql);
 
         $this->logger->info("$setName: migrated view '$view'");
+    }
+
+    /**
+     * Build a Sampler object from configuration
+     *
+     * @param \stdClass $migrationSpec
+     * @param string $tableName
+     */
+    private function buildTableSampler(\stdClass $migrationSpec, string $tableName): Sampler
+    {
+        $sampler = null;
+
+        // @todo: $migrationSpec should be an object with a getSampler() method
+        $samplerType = strtolower($migrationSpec->sampler);
+        if (array_key_exists($samplerType, SamplerMap::MAP)) {
+            $samplerClass = SamplerMap::MAP[$samplerType];
+            $sampler = new $samplerClass(
+                $migrationSpec,
+                $this->referenceStore,
+                $this->sourceConnection,
+                $tableName
+            );
+        } else {
+            throw new \RuntimeException("Unrecognised sampler type '$samplerType' required");
+        }
+
+        return $sampler;
     }
 }
