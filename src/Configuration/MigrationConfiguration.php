@@ -34,7 +34,7 @@ class MigrationConfiguration
 
     public function getTables(): array
     {
-        return (array)$this->config->tables;
+        return isset($this->config->tables) ? (array) $this->config->tables : [];
     }
 
     public function getViews(): array
