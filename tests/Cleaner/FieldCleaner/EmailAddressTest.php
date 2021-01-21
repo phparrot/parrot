@@ -12,6 +12,6 @@ class EmailAddressTest extends TestCase
     {
         $cleaner = new EmailAddress(Factory::create());
 
-        $this->assertRegExp("/.+?\@.+?$/", $cleaner->clean([]));
+        $this->assertMatchesRegularExpression("/.+?\@.+?$/", $cleaner->clean([]));
     }
 }

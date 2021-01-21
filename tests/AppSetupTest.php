@@ -37,9 +37,6 @@ class AppSetupTest extends SqliteBasedTestCase
 
     /**
      * Check that sqlite credential files handle missing directory field correctly
-     *
-     * @return void
-     * @expectedException \RuntimeException
      */
     public function testSqliteCredentialMissingDirectoryHandling(): void
     {
@@ -49,13 +46,12 @@ class AppSetupTest extends SqliteBasedTestCase
 
         $app = new App($config);
         $app->loadCredentialsFile($this->fixturesDir . '/sqlite-credentials-no-dir.json');
+        self::expectException(\RuntimeException::class);
         $app->createDestConnectionByDbName('small-sqlite-source'); // directory tested at connection time now
     }
 
     /**
      * Check that sqlite credential files handle relative directory field correctly
-     *
-     * @return void
      */
     public function testSqliteCredentialRelativeDirectoryHandling(): void
     {
@@ -70,13 +66,11 @@ class AppSetupTest extends SqliteBasedTestCase
 
         $configuredPath = $app['db.credentials']->directory;
         $this->assertTrue(is_dir($configuredPath), "Sqlite relative directory path should resolve");
-        $this->assertRegExp('#/tests/#', $configuredPath, 'Sqlite relative directory must resolve to full path');
+        $this->assertMatchesRegularExpression('#/tests/#', $configuredPath, 'Sqlite relative directory must resolve to full path');
     }
 
     /**
      * Check that sqlite credential files handle source, dest DBs correctly
-     *
-     * @return void
      */
     public function testSqliteCredentialSourceDestDirectoryHandling(): void
     {

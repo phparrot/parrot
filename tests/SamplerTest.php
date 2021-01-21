@@ -77,14 +77,13 @@ class SamplerTest extends SqliteBasedTestCase
         ];
         $sampler = $this->generateMatched((object)$config);
         $sampler->execute();
+        $this->assertCount(4, $sampler->getRows());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testMatchedNoConfigThrows(): void
     {
         $sampler = $this->generateMatched((object)[]);
+        self::expectException(\RuntimeException::class);
         $sampler->execute();
     }
 }
