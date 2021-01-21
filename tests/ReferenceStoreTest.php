@@ -2,9 +2,10 @@
 
 namespace Quidco\DbSampler\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Quidco\DbSampler\ReferenceStore;
 
-class ReferenceStoreTest extends \PHPUnit_Framework_TestCase
+class ReferenceStoreTest extends TestCase
 {
     public function testBasicFunctions(): void
     {
