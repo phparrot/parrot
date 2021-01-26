@@ -1,10 +1,10 @@
 <?php
 
-
 namespace Quidco\DbSampler\Writer;
 
-use Doctrine\DBAL\Connection;
+use Quidco\DbSampler\Database\DestinationDatabase;
 
+// @todo: add tests for this class
 class Writer
 {
     /**
@@ -15,11 +15,11 @@ class Writer
     protected $postImportSql = [];
 
     /**
-     * @var Connection
+     * @var DestinationDatabase
      */
     private $destination;
 
-    public function __construct(\stdClass $config, Connection $destination)
+    public function __construct(\stdClass $config, DestinationDatabase $destination)
     {
         $this->destination = $destination;
 
@@ -28,36 +28,13 @@ class Writer
 
     public function write(string $tableName, $row): void
     {
-        $this->sanitiseRowKeys($row);
         $this->destination->insert($tableName, $row);
     }
 
     public function postWrite(): void
     {
         foreach ($this->postImportSql as $sql) {
-            $this->destination->exec($sql);
-        }
-    }
-
-    /**
-     * Issue: DBAL insert() does not check for reserved words being used as column names.
-     *
-     * So we have to clean the keys ourselves.
-     *
-     * *Very* special case initially as the general case is likely to be slow
-     *
-     * @param mixed[] $row Row to clean
-     *
-     * @return void
-     *
-     * @throws \RuntimeException If dest connection not configured
-     */
-    private function sanitiseRowKeys(array &$row): void
-    {
-        /** @noinspection ForeachOnArrayComponentsInspection */
-        foreach (array_keys($row) as $key) {
-            $row[$this->destination->quoteIdentifier($key)] = $row[$key];
-            unset($row[$key]);
+            $this->destination->query($sql);
         }
     }
 }

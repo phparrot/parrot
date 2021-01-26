@@ -8,6 +8,8 @@ use Quidco\DbSampler\Cleaner\FieldCleaner;
 use Quidco\DbSampler\Cleaner\RowCleaner;
 use Quidco\DbSampler\Collection\TableCollection;
 use Quidco\DbSampler\Collection\ViewCollection;
+use Quidco\DbSampler\Database\DestinationDatabase;
+use Quidco\DbSampler\Database\SourceDatabase;
 use Quidco\DbSampler\ReferenceStore;
 use Quidco\DbSampler\Sampler\Sampler;
 use Quidco\DbSampler\SamplerMap\SamplerMap;
@@ -24,30 +26,28 @@ class Migrator
     private $logger;
 
     /**
-     * @var Connection
-     */
-    private $sourceConnection;
-
-    /**
-     * @var Connection
-     */
-    private $destConnection;
-
-    /**
      * @var ReferenceStore
      */
     private $referenceStore;
 
     private $customCleaners = [];
-
+    /**
+     * @var SourceDatabase
+     */
+    private $source;
+    /**
+     * @var DestinationDatabase
+     */
+    private $destination;
 
     public function __construct(
-        Connection $sourceConnection,
-        Connection $destConnection,
+        SourceDatabase $source,
+        DestinationDatabase $destination,
         LoggerInterface $logger
     ) {
-        $this->sourceConnection = $sourceConnection;
-        $this->destConnection = $destConnection;
+    
+        $this->source = $source;
+        $this->destination = $destination;
         $this->logger = $logger;
         $this->referenceStore = new ReferenceStore();
     }
@@ -59,12 +59,17 @@ class Migrator
      */
     public function execute(string $setName, TableCollection $tableCollection, ViewCollection $viewCollection): void
     {
+        // @todo: add tests for this condition
+        if ($this->source->getDriver()->getName() !== $this->destination->getDriver()->getName()) {
+            throw new \RuntimeException('Source and destination must use the same driver!');
+        }
+
         foreach ($tableCollection->getTables() as $table => $migrationSpec) {
             // @todo: it'd probably be better to have a proper `migrationspec` config object
             // rather than relying on properties being present in the json / stdClass object
 
             $sampler = $this->buildTableSampler($migrationSpec, $table);
-            $writer = new Writer($migrationSpec, $this->destConnection);
+            $writer = new Writer($migrationSpec, $this->destination);
             $cleaner = new RowCleaner($migrationSpec);
 
             foreach ($this->customCleaners as $alias => $customCleaner) {
@@ -72,7 +77,7 @@ class Migrator
             }
 
             try {
-                $this->ensureEmptyTargetTable($table, $this->sourceConnection, $this->destConnection);
+                $this->ensureEmptyTargetTable($table);
                 $rows = $sampler->execute();
 
                 foreach ($rows as $row) {
@@ -105,31 +110,11 @@ class Migrator
      * Ensure that the specified table is present in the destination DB as an empty copy of the source
      *
      * @param string $table Table name
-     * @param Connection $sourceConnection Originating DB connection
-     * @param Connection $destConnection Target DB connection
-     *
-     * @return void
-     * @throws \RuntimeException If DB type not supported
-     * @throws \Doctrine\DBAL\DBALException If target table cannot be removed or recreated
      */
-    private function ensureEmptyTargetTable($table, Connection $sourceConnection, Connection $destConnection)
+    private function ensureEmptyTargetTable(string $table): void
     {
-        // SchemaManager doesn't do enums!
-        $destConnection->exec('DROP TABLE IF EXISTS ' . $sourceConnection->quoteIdentifier($table));
-
-        $driverName = $sourceConnection->getDriver()->getName();
-        if ($driverName === 'pdo_mysql') {
-            $createSqlRow = $sourceConnection->query('SHOW CREATE TABLE ' . $sourceConnection->quoteIdentifier($table))
-                ->fetch(\PDO::FETCH_ASSOC);
-            $createSql = $createSqlRow['Create Table'];
-        } elseif ($driverName === 'pdo_sqlite') {
-            $schemaSql = 'SELECT sql FROM sqlite_master WHERE type="table" AND tbl_name=' . $sourceConnection->quoteIdentifier($table);
-            $createSql = $sourceConnection->query($schemaSql)->fetchColumn();
-        } else {
-            throw new \RuntimeException(__METHOD__ . " not implemented for $driverName yet");
-        }
-
-        $destConnection->exec($createSql);
+        $this->destination->dropTable($table);
+        $this->destination->createTable($this->source->getTableDefinition($table));
     }
 
     /**
@@ -139,60 +124,20 @@ class Migrator
      * @throws \RuntimeException If DB type not supported
      * @throws \Doctrine\DBAL\DBALException If target trigger cannot be recreated
      */
-    private function migrateTableTriggers(string $setName, TableCollection $tableCollection): void
-    {
-        foreach ($tableCollection->getTables($this->referenceStore) as $table => $sampler) {
-            try {
-                $triggerSql = $this->generateTableTriggerSql($table, $this->sourceConnection);
-                foreach ($triggerSql as $sql) {
-                    $this->destConnection->exec($sql);
-                }
-                if (count($triggerSql)) {
-                    $this->logger->info("$setName: Migrated " . count($triggerSql) . " trigger(s) on $table");
-                }
-            } catch (\Exception $e) {
-                $this->logger->error(
-                    "$setName: failed to migrate '$table' with '" . $sampler->getName() . "': " . $e->getMessage()
-                );
-                throw $e;
+    private function migrateTableTriggers(
+        string $setName,
+        TableCollection $tableCollection
+    ): void {
+    
+        try {
+            foreach ($tableCollection->getTables() as $table => $sampler) {
+                $this->destination->migrateTableTriggers($this->source->getTriggersDefinition($table));
             }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                "$setName: failed to migrate '$table' with '" . $sampler->getName() . "': " . $e->getMessage()
+            );
         }
-    }
-
-    /**
-     * Regenerate the SQL to create any triggers from the table
-     *
-     * @param string $table Table name
-     * @param Connection $dbConnection Originating DB connection
-     *
-     * @return array
-     * @throws \RuntimeException If DB type not supported
-     */
-    private function generateTableTriggerSql($table, Connection $dbConnection)
-    {
-        $driverName = $dbConnection->getDriver()->getName();
-        $triggerSql = [];
-        if ($driverName === 'pdo_mysql') {
-            $triggers = $dbConnection->fetchAll('SHOW TRIGGERS WHERE `Table`=' . $dbConnection->quote($table));
-            if ($triggers && count($triggers) > 0) {
-                foreach ($triggers as $trigger) {
-                    $triggerSql[] = 'CREATE TRIGGER ' . $trigger['Trigger'] . ' ' . $trigger['Timing'] . ' ' . $trigger['Event'] .
-                        ' ON ' . $dbConnection->quoteIdentifier($trigger['Table']) . ' FOR EACH ROW ' . PHP_EOL . $trigger['Statement'] . '; ';
-                }
-            }
-        } elseif ($driverName === 'pdo_sqlite') {
-            $schemaSql = "select sql from sqlite_master where type = 'trigger' AND tbl_name=" . $dbConnection->quote($table);
-            $triggers = $dbConnection->fetchAll($schemaSql);
-            if ($triggers && count($triggers) > 0) {
-                foreach ($triggers as $trigger) {
-                    $triggerSql[] = $trigger['sql'];
-                }
-            }
-        } else {
-            throw new \RuntimeException(__METHOD__ . " not implemented for $driverName yet");
-        }
-
-        return $triggerSql;
     }
 
     /**
@@ -200,40 +145,14 @@ class Migrator
      *
      * @param string $view Name of view to migrate
      * @param string $setName Name of migration set being executed
-     *
-     * @throws \Doctrine\DBAL\DBALException If view cannot be read
-     * @throws \RuntimeException For DB types where this is unsupported
      */
-    protected function migrateView(string $view, string $setName): void
-    {
-        $sourceConnection = $this->sourceConnection;
-        $destConnection = $this->destConnection;
-
-        $destConnection->exec('DROP VIEW IF EXISTS ' . $sourceConnection->quoteIdentifier($view));
-
-        $driverName = $sourceConnection->getDriver()->getName();
-        if ($driverName === 'pdo_mysql') {
-            $createSqlRow = $sourceConnection->query('SHOW CREATE VIEW ' . $sourceConnection->quoteIdentifier($view))
-                ->fetch(\PDO::FETCH_ASSOC);
-            $createSql = $createSqlRow['Create View'];
-
-            $currentDestUser = $destConnection->fetchColumn('SELECT CURRENT_USER()');
-
-            if ($currentDestUser) {
-                //Because MySQL. SELECT CURRENT_USER() returns an unescaped user
-                $currentDestUser = implode('@', array_map(function ($p) use ($destConnection) {
-                    return $destConnection->getDatabasePlatform()->quoteSingleIdentifier($p);
-                }, explode('@', $currentDestUser)));
-
-                $createSql = preg_replace('/\bDEFINER=`[^`]+`@`[^`]+`(?=\s)/', "DEFINER=$currentDestUser", $createSql);
-            }
-        } elseif ($driverName === 'pdo_sqlite') {
-            $schemaSql = 'SELECT SQL FROM sqlite_master WHERE NAME=' . $sourceConnection->quoteIdentifier($view);
-            $createSql = $sourceConnection->query($schemaSql)->fetchColumn();
-        } else {
-            throw new \RuntimeException(__METHOD__ . " not implemented for $driverName yet");
-        }
-        $destConnection->exec($createSql);
+    protected function migrateView(
+        string $view,
+        string $setName
+    ): void {
+    
+        $this->destination->dropView($view);
+        $this->destination->createView($this->source->getViewDefinition($view));
 
         $this->logger->info("$setName: migrated view '$view'");
     }
@@ -255,7 +174,7 @@ class Migrator
             $sampler = new $samplerClass(
                 $migrationSpec,
                 $this->referenceStore,
-                $this->sourceConnection,
+                $this->source,
                 $tableName
             );
         } else {
