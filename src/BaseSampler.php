@@ -1,9 +1,9 @@
 <?php
 
-namespace Quidco\DbSampler;
+namespace PHParrot\Parrot;
 
 use Doctrine\DBAL\Connection;
-use Quidco\DbSampler\Database\SourceDatabase;
+use PHParrot\Parrot\Database\SourceDatabase;
 
 /**
  * Abstract BaseSampler class with some common functionality.

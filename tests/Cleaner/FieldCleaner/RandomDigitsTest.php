@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Tests\Cleaner\FieldCleaner;
 
-use Quidco\DbSampler\Cleaner\FieldCleaner\RandomDigits;
+use PHParrot\Parrot\Cleaner\FieldCleaner\RandomDigits;
 use PHPUnit\Framework\TestCase;
 
 class RandomDigitsTest extends TestCase

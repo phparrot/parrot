@@ -1,9 +1,9 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Cleaner;
+namespace PHParrot\Parrot\Tests\Cleaner;
 
-use Quidco\DbSampler\Cleaner\CleanerConfig;
-use Quidco\DbSampler\Cleaner\FieldCleanerFactory;
+use PHParrot\Parrot\Cleaner\CleanerConfig;
+use PHParrot\Parrot\Cleaner\FieldCleanerFactory;
 use PHPUnit\Framework\TestCase;
 
 class FieldCleanerFactoryTest extends TestCase

@@ -1,19 +1,19 @@
 <?php
 
-namespace Quidco\DbSampler\Migrator;
+namespace PHParrot\Parrot\Migrator;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
-use Quidco\DbSampler\Cleaner\FieldCleaner;
-use Quidco\DbSampler\Cleaner\RowCleaner;
-use Quidco\DbSampler\Collection\TableCollection;
-use Quidco\DbSampler\Collection\ViewCollection;
-use Quidco\DbSampler\Database\DestinationDatabase;
-use Quidco\DbSampler\Database\SourceDatabase;
-use Quidco\DbSampler\ReferenceStore;
-use Quidco\DbSampler\Sampler\Sampler;
-use Quidco\DbSampler\SamplerMap\SamplerMap;
-use Quidco\DbSampler\Writer\Writer;
+use PHParrot\Parrot\Cleaner\FieldCleaner;
+use PHParrot\Parrot\Cleaner\RowCleaner;
+use PHParrot\Parrot\Collection\TableCollection;
+use PHParrot\Parrot\Collection\ViewCollection;
+use PHParrot\Parrot\Database\DestinationDatabase;
+use PHParrot\Parrot\Database\SourceDatabase;
+use PHParrot\Parrot\ReferenceStore;
+use PHParrot\Parrot\Sampler\Sampler;
+use PHParrot\Parrot\SamplerMap\SamplerMap;
+use PHParrot\Parrot\Writer\Writer;
 
 /**
  * Migrator class to handle all migrations in a set

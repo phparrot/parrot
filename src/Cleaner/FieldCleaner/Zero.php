@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Cleaner\FieldCleaner;
 
-class Zero implements \Quidco\DbSampler\Cleaner\FieldCleaner
+class Zero implements \PHParrot\Parrot\Cleaner\FieldCleaner
 {
     public function clean(array $parameters, ?string $originalValue = null)
     {

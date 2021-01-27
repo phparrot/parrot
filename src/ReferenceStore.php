@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Quidco\DbSampler;
+namespace PHParrot\Parrot;
 
 class ReferenceStore
 {

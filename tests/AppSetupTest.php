@@ -1,9 +1,9 @@
 <?php
 
-namespace Quidco\DbSampler\Tests;
+namespace PHParrot\Parrot\Tests;
 
-use Quidco\DbSampler\App;
-use Quidco\DbSampler\Configuration\MigrationConfigurationCollection;
+use PHParrot\Parrot\App;
+use PHParrot\Parrot\Configuration\MigrationConfigurationCollection;
 
 /**
  * Class AppSetupTest

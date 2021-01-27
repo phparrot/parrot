@@ -1,6 +1,6 @@
 <?php
 
-namespace Quidco\DbSampler\Cleaner;
+namespace PHParrot\Parrot\Cleaner;
 
 interface FieldCleaner
 {

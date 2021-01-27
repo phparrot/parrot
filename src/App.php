@@ -1,6 +1,6 @@
 <?php
 
-namespace Quidco\DbSampler;
+namespace PHParrot\Parrot;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -8,12 +8,12 @@ use Pimple\Container;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Quidco\DbSampler\Collection\TableCollection;
-use Quidco\DbSampler\Collection\ViewCollection;
-use Quidco\DbSampler\Configuration\MigrationConfigurationCollection;
-use Quidco\DbSampler\Database\DestinationDatabase;
-use Quidco\DbSampler\Database\SourceDatabase;
-use Quidco\DbSampler\Migrator\Migrator;
+use PHParrot\Parrot\Collection\TableCollection;
+use PHParrot\Parrot\Collection\ViewCollection;
+use PHParrot\Parrot\Configuration\MigrationConfigurationCollection;
+use PHParrot\Parrot\Database\DestinationDatabase;
+use PHParrot\Parrot\Database\SourceDatabase;
+use PHParrot\Parrot\Migrator\Migrator;
 
 /**
  * Dependency container / app for DbSampler

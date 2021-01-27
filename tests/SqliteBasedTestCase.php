@@ -1,12 +1,12 @@
 <?php
 
-namespace Quidco\DbSampler\Tests;
+namespace PHParrot\Parrot\Tests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use PHPUnit\Framework\TestCase;
-use Quidco\DbSampler\Database\DestinationDatabase;
-use Quidco\DbSampler\Database\SourceDatabase;
+use PHParrot\Parrot\Database\DestinationDatabase;
+use PHParrot\Parrot\Database\SourceDatabase;
 
 abstract class SqliteBasedTestCase extends TestCase
 {

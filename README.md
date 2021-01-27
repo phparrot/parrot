@@ -1,11 +1,21 @@
-maple-syrup-group/dbsampler
+PHParrot/Parrot
 ===========================
-
-[![Build Status](https://travis-ci.org/MapleSyrupGroup/dbsampler.svg?branch=master)](https://travis-ci.org/MapleSyrupGroup/dbsampler)
 
 A general tool for extracting and cleaning selected tables from a database for use as fixtures. 
 Copies a subset of tables from one database to another under the control of a json configuration file. 
 The latter database can then be dumped to SQL for use as a fixture file.
+
+Why PHParrot?
+-----
+
+When we visited our nan at weekends as kids, my brother and I would wait until all the adults were out of the
+room and then endlessly repeat all the (admittedly very mild) swear words we knew at her pet parrot,
+in the hope that it would copy us.
+
+As this tool copies (parrots) text from one place to another (and because this seemed like a perfect opportunity
+to give a project one of those names with 'PHP' stuffed into it), 'PHParrot' kind-of seemed appropriate. 
+
+Aside: Nan's parrot never repeated any words we tried teaching it, but it had learned to belch (my uncle's influence).
 
 Usage
 -----
@@ -97,7 +107,7 @@ assumed to be `*.sqlite` files in this directory
       "destDb": "small-dest",               # Name of the destination DB. This DB will get trashed
       "tables": {                           # A set of tables to be copied over. Each table is defined as "table": config
                                             # Every config stanza requires a sampler field. For now, look these up in 
-                                            # \Quidco\DbSampler\MigrationConfigProcessor::$samplerMap
+                                            # \PHParrot\Parrot\MigrationConfigProcessor::$samplerMap
                                             # All other fields depend on the specific sampler being used; these should 
                                             # all be documented in their own class files in src/Sample
         "fruits": {
@@ -136,7 +146,7 @@ assumed to be `*.sqlite` files in this directory
         },
         "baskets": {
           "sampler": "matched",             # samplers support field cleaners that are defined in
-                                            # \Quidco\DbSampler\FieldCleanerProvider::getCleanerByName
+                                            # \PHParrot\Parrot\FieldCleanerProvider::getCleanerByName
                                             # They modify or replace the content of the field that they are keyed to
           "constraints": {
             "id": "$basket_ids"
@@ -163,8 +173,8 @@ used directly in the cleanFields stanza by using `"name": "faker:GENERATOR"`, eg
 
 Extending the project
 ---------------------
-The tool is designed to be extended primarily by adding custom Samplers (which must implement `\Quidco\DbSampler\Sampler\Sampler`) 
-and cleaners (which must implement `\Quidco\DbSampler\Cleaner\FieldCleaner` ànd be registered with `\Quidco\DbSampler\Cleaner\RowCleaner::registerCleaner`).
+The tool is designed to be extended primarily by adding custom Samplers (which must implement `\PHParrot\Parrot\Sampler\Sampler`) 
+and cleaners (which must implement `\PHParrot\Parrot\Cleaner\FieldCleaner` ànd be registered with `\PHParrot\Parrot\Cleaner\RowCleaner::registerCleaner`).
 
 Currently, only mysql and sqlite databases are supported, but this could also be extended.
 

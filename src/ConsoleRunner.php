@@ -1,14 +1,14 @@
 <?php
-namespace Quidco\DbSampler;
+namespace PHParrot\Parrot;
 
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Quidco\DbSampler\Configuration\MigrationConfigurationCollection;
+use PHParrot\Parrot\Configuration\MigrationConfigurationCollection;
 
 /**
- * Console Runner for Quidco\DbSampler\App
+ * Console Runner for PHParrot\Parrot\App
  */
 class ConsoleRunner implements LoggerAwareInterface
 {

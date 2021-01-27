@@ -1,5 +1,5 @@
 {
-    "name": "nealio82/dbsampler",
+    "name": "phparrot/parrot",
     "description": "Rule-based generation of fixture databases by sampling operational databases. Forked from maple-syrup-group/dbsampler",
     "license": "MIT",
     "type": "project",
@@ -27,12 +27,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Quidco\\DbSampler\\": "src/"
+            "PHParrot\\Parrot\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Quidco\\DbSampler\\Tests\\": "tests/"
+            "PHParrot\\Parrot\\Tests\\": "tests/"
         }
     },
     "config": {

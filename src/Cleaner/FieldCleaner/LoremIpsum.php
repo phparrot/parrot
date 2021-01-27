@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Quidco\DbSampler\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Cleaner\FieldCleaner;
 
 use Faker\Generator;
-use Quidco\DbSampler\Cleaner\FieldCleaner;
+use PHParrot\Parrot\Cleaner\FieldCleaner;
 
 class LoremIpsum implements FieldCleaner
 {

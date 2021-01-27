@@ -1,10 +1,10 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Cleaner;
+namespace PHParrot\Parrot\Tests\Cleaner;
 
 use PHPUnit\Framework\TestCase;
-use Quidco\DbSampler\Cleaner\FieldCleaner;
-use Quidco\DbSampler\Cleaner\RowCleaner;
+use PHParrot\Parrot\Cleaner\FieldCleaner;
+use PHParrot\Parrot\Cleaner\RowCleaner;
 
 class RowCleanerTest extends TestCase
 {

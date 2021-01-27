@@ -1,19 +1,19 @@
 <?php
 
 
-namespace Quidco\DbSampler\Cleaner;
+namespace PHParrot\Parrot\Cleaner;
 
 use Faker\Factory;
-use Quidco\DbSampler\Cleaner\FieldCleaner\DateTime;
-use Quidco\DbSampler\Cleaner\FieldCleaner\EmailAddress;
-use Quidco\DbSampler\Cleaner\FieldCleaner\EmptyString;
-use Quidco\DbSampler\Cleaner\FieldCleaner\Faker;
-use Quidco\DbSampler\Cleaner\FieldCleaner\FullName;
-use Quidco\DbSampler\Cleaner\FieldCleaner\LoremIpsum;
-use Quidco\DbSampler\Cleaner\FieldCleaner\NullCleaner;
-use Quidco\DbSampler\Cleaner\FieldCleaner\RandomDigits;
-use Quidco\DbSampler\Cleaner\FieldCleaner\User;
-use Quidco\DbSampler\Cleaner\FieldCleaner\Zero;
+use PHParrot\Parrot\Cleaner\FieldCleaner\DateTime;
+use PHParrot\Parrot\Cleaner\FieldCleaner\EmailAddress;
+use PHParrot\Parrot\Cleaner\FieldCleaner\EmptyString;
+use PHParrot\Parrot\Cleaner\FieldCleaner\Faker;
+use PHParrot\Parrot\Cleaner\FieldCleaner\FullName;
+use PHParrot\Parrot\Cleaner\FieldCleaner\LoremIpsum;
+use PHParrot\Parrot\Cleaner\FieldCleaner\NullCleaner;
+use PHParrot\Parrot\Cleaner\FieldCleaner\RandomDigits;
+use PHParrot\Parrot\Cleaner\FieldCleaner\User;
+use PHParrot\Parrot\Cleaner\FieldCleaner\Zero;
 
 class FieldCleanerFactory
 {

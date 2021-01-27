@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Tests\Cleaner\FieldCleaner;
 
-use Quidco\DbSampler\Cleaner\FieldCleaner\DateTime;
+use PHParrot\Parrot\Cleaner\FieldCleaner\DateTime;
 use PHPUnit\Framework\TestCase;
 
 class DateTimeTest extends TestCase

@@ -1,9 +1,9 @@
 <?php
 
-namespace Quidco\DbSampler\Tests;
+namespace PHParrot\Parrot\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Quidco\DbSampler\ReferenceStore;
+use PHParrot\Parrot\ReferenceStore;
 
 class ReferenceStoreTest extends TestCase
 {

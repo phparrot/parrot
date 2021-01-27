@@ -1,14 +1,14 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Migrator;
+namespace PHParrot\Parrot\Tests\Migrator;
 
 use Psr\Log\LoggerInterface;
-use Quidco\DbSampler\Collection\TableCollection;
-use Quidco\DbSampler\Collection\ViewCollection;
-use Quidco\DbSampler\Configuration\MigrationConfiguration;
-use Quidco\DbSampler\Migrator\Migrator;
-use Quidco\DbSampler\Tests\SqliteBasedTestCase;
-use Quidco\DbSampler\ReferenceStore;
+use PHParrot\Parrot\Collection\TableCollection;
+use PHParrot\Parrot\Collection\ViewCollection;
+use PHParrot\Parrot\Configuration\MigrationConfiguration;
+use PHParrot\Parrot\Migrator\Migrator;
+use PHParrot\Parrot\Tests\SqliteBasedTestCase;
+use PHParrot\Parrot\ReferenceStore;
 
 class MigratorTest extends SqliteBasedTestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Tests\Cleaner\FieldCleaner;
 
 use Faker\Factory;
-use Quidco\DbSampler\Cleaner\FieldCleaner\Faker;
+use PHParrot\Parrot\Cleaner\FieldCleaner\Faker;
 use PHPUnit\Framework\TestCase;
 
 class FakerTest extends TestCase

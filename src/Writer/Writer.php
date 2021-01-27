@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Writer;
+namespace PHParrot\Parrot\Writer;
 
-use Quidco\DbSampler\Database\DestinationDatabase;
+use PHParrot\Parrot\Database\DestinationDatabase;
 
 // @todo: add tests for this class
 class Writer

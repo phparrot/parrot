@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Quidco\DbSampler\SamplerMap;
+namespace PHParrot\Parrot\SamplerMap;
 
-use Quidco\DbSampler\Sampler\AllRows;
-use Quidco\DbSampler\Sampler\None;
-use Quidco\DbSampler\Sampler\MatchedRows;
-use Quidco\DbSampler\Sampler\NewestById;
+use PHParrot\Parrot\Sampler\AllRows;
+use PHParrot\Parrot\Sampler\None;
+use PHParrot\Parrot\Sampler\MatchedRows;
+use PHParrot\Parrot\Sampler\NewestById;
 
 class SamplerMap
 {

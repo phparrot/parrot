@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Sampler;
+namespace PHParrot\Parrot\Sampler;
 
-use Quidco\DbSampler\BaseSampler;
+use PHParrot\Parrot\BaseSampler;
 
 class AllRows extends BaseSampler implements Sampler
 {

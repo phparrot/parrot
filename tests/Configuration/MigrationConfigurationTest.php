@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Configuration;
+namespace PHParrot\Parrot\Tests\Configuration;
 
-use Quidco\DbSampler\Configuration\MigrationConfiguration;
+use PHParrot\Parrot\Configuration\MigrationConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class MigrationConfigurationTest extends TestCase

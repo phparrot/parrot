@@ -1,10 +1,10 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Collection;
+namespace PHParrot\Parrot\Tests\Collection;
 
-use Quidco\DbSampler\Collection\TableCollection;
+use PHParrot\Parrot\Collection\TableCollection;
 use PHPUnit\Framework\TestCase;
-use Quidco\DbSampler\Configuration\MigrationConfiguration;
+use PHParrot\Parrot\Configuration\MigrationConfiguration;
 
 class TableCollectionTest extends TestCase
 {

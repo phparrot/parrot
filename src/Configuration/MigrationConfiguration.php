@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Quidco\DbSampler\Configuration;
+namespace PHParrot\Parrot\Configuration;
 
 class MigrationConfiguration
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Quidco\DbSampler;
+namespace PHParrot\Parrot;
 
 use Doctrine\DBAL\Connection;
 

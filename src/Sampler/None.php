@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Sampler;
+namespace PHParrot\Parrot\Sampler;
 
-use Quidco\DbSampler\BaseSampler;
+use PHParrot\Parrot\BaseSampler;
 
 /**
  * Essentially a 'no-op' table sampler - allows tables to be specified as required without copying any data

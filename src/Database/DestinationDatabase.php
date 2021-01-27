@@ -1,6 +1,6 @@
 <?php
 
-namespace Quidco\DbSampler\Database;
+namespace PHParrot\Parrot\Database;
 
 // @todo: add tests for this class
 class DestinationDatabase extends Database

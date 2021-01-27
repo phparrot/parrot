@@ -1,12 +1,12 @@
 <?php
 
-namespace Quidco\DbSampler\Tests;
+namespace PHParrot\Parrot\Tests;
 
-use Quidco\DbSampler\ReferenceStore;
-use Quidco\DbSampler\Sampler\AllRows;
-use Quidco\DbSampler\Sampler\None;
-use Quidco\DbSampler\Sampler\MatchedRows;
-use Quidco\DbSampler\Sampler\Sampler;
+use PHParrot\Parrot\ReferenceStore;
+use PHParrot\Parrot\Sampler\AllRows;
+use PHParrot\Parrot\Sampler\None;
+use PHParrot\Parrot\Sampler\MatchedRows;
+use PHParrot\Parrot\Sampler\Sampler;
 
 class SamplerTest extends SqliteBasedTestCase
 {

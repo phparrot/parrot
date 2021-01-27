@@ -1,10 +1,10 @@
 <?php
 
-namespace Quidco\DbSampler\Tests\Collection;
+namespace PHParrot\Parrot\Tests\Collection;
 
 use PHPUnit\Framework\TestCase;
-use Quidco\DbSampler\Collection\ViewCollection;
-use Quidco\DbSampler\Configuration\MigrationConfiguration;
+use PHParrot\Parrot\Collection\ViewCollection;
+use PHParrot\Parrot\Configuration\MigrationConfiguration;
 
 class ViewCollectionTest extends TestCase
 {

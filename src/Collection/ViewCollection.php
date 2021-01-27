@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Collection;
+namespace PHParrot\Parrot\Collection;
 
-use Quidco\DbSampler\Configuration\MigrationConfiguration;
+use PHParrot\Parrot\Configuration\MigrationConfiguration;
 
 class ViewCollection
 {

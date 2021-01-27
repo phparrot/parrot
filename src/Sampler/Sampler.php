@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Quidco\DbSampler\Sampler;
+namespace PHParrot\Parrot\Sampler;
 
 interface Sampler
 {

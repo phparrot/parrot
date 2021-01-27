@@ -1,8 +1,8 @@
 <?php
 
-namespace Quidco\DbSampler\Cleaner\FieldCleaner;
+namespace PHParrot\Parrot\Cleaner\FieldCleaner;
 
-use Quidco\DbSampler\Cleaner\FieldCleaner;
+use PHParrot\Parrot\Cleaner\FieldCleaner;
 
 class NullCleaner implements FieldCleaner
 {

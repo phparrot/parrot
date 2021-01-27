@@ -1,6 +1,6 @@
 <?php
 
-namespace Quidco\DbSampler\Database;
+namespace PHParrot\Parrot\Database;
 
 use Doctrine\DBAL\Driver\Connection;
 
