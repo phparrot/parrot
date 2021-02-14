@@ -2,7 +2,6 @@
 
 namespace PHParrot\Parrot\Migrator;
 
-use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use PHParrot\Parrot\Cleaner\FieldCleaner;
 use PHParrot\Parrot\Cleaner\RowCleaner;
@@ -45,7 +44,6 @@ class Migrator
         DestinationDatabase $destination,
         LoggerInterface $logger
     ) {
-    
         $this->source = $source;
         $this->destination = $destination;
         $this->logger = $logger;
@@ -78,7 +76,7 @@ class Migrator
 
             try {
                 $this->ensureEmptyTargetTable($table);
-                $rows = $sampler->execute();
+                $rows = $sampler->getRows();
 
                 foreach ($rows as $row) {
                     $writer->write($table, $cleaner->cleanRow($row));
@@ -128,7 +126,6 @@ class Migrator
         string $setName,
         TableCollection $tableCollection
     ): void {
-    
         try {
             foreach ($tableCollection->getTables() as $table => $sampler) {
                 $this->destination->migrateTableTriggers($this->source->getTriggersDefinition($table));
@@ -150,7 +147,6 @@ class Migrator
         string $view,
         string $setName
     ): void {
-    
         $this->destination->dropView($view);
         $this->destination->createView($this->source->getViewDefinition($view));
 

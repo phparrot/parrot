@@ -4,6 +4,7 @@ namespace PHParrot\Parrot\Tests;
 
 use PHParrot\Parrot\ReferenceStore;
 use PHParrot\Parrot\Sampler\AllRows;
+use PHParrot\Parrot\Sampler\Exception\RequiredConfigurationValueNotProvided;
 use PHParrot\Parrot\Sampler\None;
 use PHParrot\Parrot\Sampler\MatchedRows;
 use PHParrot\Parrot\Sampler\Sampler;
@@ -43,7 +44,7 @@ class SamplerTest extends SqliteBasedTestCase
             'fruits'
         );
 
-        $sampler->execute();
+        $sampler->getRows();
 
         $this->assertCount(4, $referenceStore->getReferencesByName('fruit_ids'));
     }
@@ -65,7 +66,7 @@ class SamplerTest extends SqliteBasedTestCase
             'where' => ['basket_id > 1']
         ];
         $sampler = $this->generateMatched((object)$config);
-        $sampler->execute();
+        $sampler->getRows();
 
         $this->assertCount(2, $sampler->getRows());
     }
@@ -76,14 +77,14 @@ class SamplerTest extends SqliteBasedTestCase
             'where' => ['basket_id > 1']
         ];
         $sampler = $this->generateMatched((object)$config);
-        $sampler->execute();
+        $sampler->getRows();
         $this->assertCount(4, $sampler->getRows());
     }
 
     public function testMatchedNoConfigThrows(): void
     {
         $sampler = $this->generateMatched((object)[]);
-        self::expectException(\RuntimeException::class);
-        $sampler->execute();
+        self::expectException(RequiredConfigurationValueNotProvided::class);
+        $sampler->getRows();
     }
 }
