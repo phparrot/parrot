@@ -2,7 +2,10 @@
 
 namespace PHParrot\Parrot\Sampler;
 
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use PHParrot\Parrot\BaseSampler;
+use PHParrot\Parrot\Sampler\Exception\RequiredConfigurationValueNotProvided;
+use PHParrot\Parrot\Sampler\Exception\TableNotFound;
 
 /**
  * Sample DB rows that match specific values
@@ -24,52 +27,29 @@ use PHParrot\Parrot\BaseSampler;
  *     ]
  * }
  */
-class MatchedRows extends BaseSampler implements Sampler
+class MatchedRows extends BaseSampler
 {
-    /**
-     * Assoc array of field => static value
-     *
-     * @var array
-     */
-    protected $constraints;
-    /**
-     * @var array
-     */
-    private $where;
-
-    /**
-     * Return a unique name for this sampler for informational purposes
-     *
-     * @return string
-     * @inheritdoc
-     */
     public function getName(): string
     {
         return 'Matched';
     }
 
-    /**
-     * Return all rows that this sampler would copy
-     *
-     * @inheritdoc
-     */
-    public function getRows(): array
+    public function fetchData(): array
     {
-        $this->where = $this->config->where ?? [];
-        if ($this->where) {
-            $this->constraints = $this->config->constraints ?? [];
-        } else {
-            $this->constraints = (array)$this->demandParameterValue($this->config, 'constraints');
+        if (!isset($this->config->constraints) && !isset($this->config->where)) {
+            throw new RequiredConfigurationValueNotProvided('Either parameter \'constraints\' or \'where\' is required but neither was provided');
         }
 
-        $queryBuilder = $this->source->getConnection()->createQueryBuilder()->select('*')->from($this->tableName);
-        $queryBuilder->where('1');
+        $where = $this->config->where ?? [];
+        $constraints = $this->config->constraints ?? [];
 
-        foreach ($this->constraints as $field => $value) {
+        $query = sprintf("SELECT * FROM %s WHERE 1", $this->source->getConnection()->quote($this->tableName));
+
+        foreach ($constraints as $field => $value) {
             // Handle remembered reference variables
             if (is_string($value) && strpos($value, '$') === 0) {
                 $variable = substr($value, 1);
-                $value = $this->referenceStore->getReferencesByName($variable, null);
+                $value = $this->referenceStore->getReferencesByName($variable);
                 if (is_null($value)) {
                     throw new \RuntimeException("'\${$variable}' is not a recognised remembered value");
                 }
@@ -77,33 +57,36 @@ class MatchedRows extends BaseSampler implements Sampler
 
             if (is_array($value)) {
                 if (count($value)) {
-                    $questionMarks = implode(', ', array_pad([], count($value), '?'));
-                    $queryBuilder->andWhere(
-                        $this->source->getConnection()->quoteIdentifier($field) . ' IN (' . $questionMarks . ')'
-                    );
-
-                    foreach ((array)$value as $alternate) { // (array) required to keep static analysis from screaming
-                        $queryBuilder->createPositionalParameter($alternate);
-                    }
-                } else {
-                    $queryBuilder->andWhere('0');
+                    $query .= ' AND ' . $this->source->getConnection()->quoteIdentifier($field) . ' IN (' . implode(', ', \array_map(function ($item) {
+                        return $this->source->getConnection()->quote($item);
+                    }, $value)) . ')';
                 }
             } else {
-                $queryBuilder->andWhere($this->source->getConnection()->quoteIdentifier($field) . ' = ?');
-                $queryBuilder->createPositionalParameter($value);
+                $query .= " AND " . $this->source->getConnection()->quoteIdentifier($field) . ' = ' . $this->source->getConnection()->quote($value);
             }
         }
 
-        foreach ($this->where as $where) {
-            $queryBuilder->andWhere($where);
+        foreach ($where as $condition) {
+            $query .= " AND " . $condition;
         }
 
         if ($this->limit) {
-            $queryBuilder->setMaxResults($this->limit);
+            $query .= " LIMIT " . $this->limit;
         }
 
-        $query = $queryBuilder->execute();
+        try {
+            $statement = $this->source->getConnection()->executeQuery($query);
+        } catch (TableNotFoundException $exception) {
+            throw new TableNotFound(
+                sprintf(
+                    "Table %s does not exist",
+                    $this->tableName
+                ),
+                0,
+                $exception
+            );
+        }
 
-        return $query->fetchAll();
+        return $statement->fetchAllAssociative();
     }
 }

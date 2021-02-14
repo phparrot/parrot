@@ -2,48 +2,48 @@
 
 namespace PHParrot\Parrot\Sampler;
 
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use PHParrot\Parrot\BaseSampler;
+use PHParrot\Parrot\Sampler\Exception\RequiredConfigurationValueNotProvided;
+use PHParrot\Parrot\Sampler\Exception\TableNotFound;
 
-class NewestById extends BaseSampler implements Sampler
+class NewestById extends BaseSampler
 {
-
-    /**
-     * @var string
-     */
-    protected $idField;
-
-    /**
-     * @var int
-     */
-    protected $quantity;
-
-    /**
-     * Return a unique name for this sampler for informational purposes
-     *
-     * @return string
-     * @inheritdoc
-     */
     public function getName(): string
     {
         return 'NewestById';
     }
 
-
-    /**
-     * Return all rows that this sampler would copy
-     *
-     * @inheritdoc
-     */
-    public function getRows(): array
+    public function fetchData(): array
     {
-        $this->quantity = (int)$this->demandParameterValue($this->config, 'quantity'); // TODO possibly rename to 'limit'
-        $this->idField = $this->demandParameterValue($this->config, 'idField');
+        if (!isset($this->config->idField)) {
+            throw new RequiredConfigurationValueNotProvided('The required parameter \'idField\' was not provided');
+        }
 
-        $query = $this->source->getConnection()->createQueryBuilder()->select('*')->from($this->tableName)
-            ->addOrderBy($this->idField, 'DESC')
-            ->setMaxResults($this->quantity)
-            ->execute();
+        if (!isset($this->config->quantity)) {
+            throw new RequiredConfigurationValueNotProvided('The required parameter \'quantity\' was not provided');
+        }
 
-        return $query->fetchAll();
+        try {
+            $query = sprintf(
+                'SELECT * FROM %s ORDER BY %s DESC LIMIT %s',
+                $this->source->getConnection()->quote($this->tableName),
+                $this->config->idField,
+                $this->config->quantity
+            );
+
+            $statement = $this->source->getConnection()->executeQuery($query);
+        } catch (TableNotFoundException $exception) {
+            throw new TableNotFound(
+                sprintf(
+                    "Table %s does not exist",
+                    $this->tableName
+                ),
+                0,
+                $exception
+            );
+        }
+
+        return $statement->fetchAllAssociative();
     }
 }

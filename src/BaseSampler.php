@@ -2,15 +2,15 @@
 
 namespace PHParrot\Parrot;
 
-use Doctrine\DBAL\Connection;
 use PHParrot\Parrot\Database\SourceDatabase;
+use PHParrot\Parrot\Sampler\Sampler;
 
 /**
  * Abstract BaseSampler class with some common functionality.
  *
  * Not for use as a type hint, use Sampler for that
  */
-abstract class BaseSampler
+abstract class BaseSampler implements Sampler
 {
     /**
      * Table on which the sampler is operating
@@ -48,6 +48,7 @@ abstract class BaseSampler
      */
     protected $config;
 
+    abstract protected function fetchData(): array;
 
     public function __construct(
         \stdClass $config,
@@ -64,13 +65,9 @@ abstract class BaseSampler
         $this->tableName = $tableName;
     }
 
-    /**
-     * Naïve implementation - grab all rows and insert
-     *
-     */
-    public function execute(): array
+    public function getRows(): array
     {
-        $rows = $this->getRows();
+        $rows = $this->fetchData();
         $references = [];
 
         foreach ($this->referenceFields as $key => $variable) {
@@ -91,23 +88,5 @@ abstract class BaseSampler
         }
 
         return $rows;
-    }
-
-    /**
-     * Convenience method to assert presence of a config key while fetching
-     *
-     * @param \stdClass $config Config block
-     * @param string $key Key to be found in block
-     *
-     * @return mixed
-     * @throws \RuntimeException If required key missing
-     */
-    protected function demandParameterValue($config, $key)
-    {
-        if (!isset($config->$key)) {
-            throw new \RuntimeException("'$key' missing from config required by " . get_called_class());
-        }
-
-        return $config->$key;
     }
 }
