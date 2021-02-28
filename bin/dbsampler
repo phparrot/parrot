@@ -2,7 +2,7 @@
 
 <?php
 
-use Quidco\DbSampler\ConsoleRunner;
+use PHParrot\Parrot\ConsoleRunner;
 
 $ownVendorAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -18,7 +18,7 @@ if (file_exists($ownVendorAutoload)) {
     }
 }
 
-if (!class_exists('Quidco\DbSampler\ConsoleRunner')) {
+if (!class_exists('PHParrot\Parrot\ConsoleRunner')) {
     echo 'No functional autoloader found';
     die(-1);
 }
