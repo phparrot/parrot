@@ -48,7 +48,7 @@ abstract class BaseSampler implements Sampler
      */
     protected $config;
 
-    abstract protected function fetchData(): iterable;
+    abstract protected function fetchData(): \Generator;
 
     public function __construct(
         \stdClass $config,

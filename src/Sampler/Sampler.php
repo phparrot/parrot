@@ -8,5 +8,5 @@ interface Sampler
 
     // make this protected, and probably move everything onto BaseSampler
     // make BaseSampler implement this interface instead
-    public function getRows(): iterable;
+    public function getRows(): \Generator;
 }

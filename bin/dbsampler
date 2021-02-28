@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 
 <?php
+
 use Quidco\DbSampler\ConsoleRunner;
 
 $ownVendorAutoload = dirname(__DIR__) . '/vendor/autoload.php';
