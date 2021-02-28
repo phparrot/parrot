@@ -12,7 +12,8 @@ class ReferenceStoreTest extends TestCase
         $store = new ReferenceStore();
         $primes = [1, 3, 5, 7];
         $store->setReferencesByName('primes', $primes);
-        $this->assertEquals($primes, $store->getReferencesByName('primes'));
+        $store->setReferenceByName('primes', 11);
+        $this->assertEquals(\array_merge($primes, [11]), $store->getReferencesByName('primes'));
         $this->assertEquals([], $store->getReferencesByName('nosuch'));
     }
 }

@@ -48,7 +48,7 @@ abstract class BaseSampler implements Sampler
      */
     protected $config;
 
-    abstract protected function fetchData(): array;
+    abstract protected function fetchData(): iterable;
 
     public function __construct(
         \stdClass $config,
@@ -65,28 +65,17 @@ abstract class BaseSampler implements Sampler
         $this->tableName = $tableName;
     }
 
-    public function getRows(): array
+    public function getRows(): \Generator
     {
         $rows = $this->fetchData();
-        $references = [];
-
-        foreach ($this->referenceFields as $key => $variable) {
-            if (!array_key_exists($variable, $references)) {
-                $references[$variable] = [];
-            }
-        }
 
         foreach ($rows as $row) {
             // Store any reference fields we've been told to remember
             foreach ($this->referenceFields as $key => $variable) {
-                $references[$variable][] = $row[$key];
+                $this->referenceStore->setReferenceByName($variable, $row[$key]);
             }
-        }
 
-        foreach ($references as $reference => $values) {
-            $this->referenceStore->setReferencesByName($reference, $values);
+            yield $row;
         }
-
-        return $rows;
     }
 }

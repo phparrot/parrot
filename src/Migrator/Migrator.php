@@ -83,7 +83,7 @@ class Migrator
                 }
                 $writer->postWrite();
 
-                $this->logger->info("$setName: migrated '$table' with '" . $sampler->getName() . "': " . \count($rows) . " rows");
+                $this->logger->info("$setName: migrated '$table' with '" . $sampler->getName());
             } catch (\Exception $e) {
                 $this->logger->error(
                     "$setName: failed to migrate '$table' with '" . $sampler->getName() . "': " . $e->getMessage()

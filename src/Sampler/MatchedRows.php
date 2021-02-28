@@ -34,7 +34,7 @@ class MatchedRows extends BaseSampler
         return 'Matched';
     }
 
-    public function fetchData(): array
+    public function fetchData(): \Generator
     {
         if (!isset($this->config->constraints) && !isset($this->config->where)) {
             throw new RequiredConfigurationValueNotProvided('Either parameter \'constraints\' or \'where\' is required but neither was provided');
@@ -58,8 +58,8 @@ class MatchedRows extends BaseSampler
             if (is_array($value)) {
                 if (count($value)) {
                     $query .= ' AND ' . $this->source->getConnection()->quoteIdentifier($field) . ' IN (' . implode(', ', \array_map(function ($item) {
-                        return $this->source->getConnection()->quote($item);
-                    }, $value)) . ')';
+                            return $this->source->getConnection()->quote($item);
+                        }, $value)) . ')';
                 }
             } else {
                 $query .= " AND " . $this->source->getConnection()->quoteIdentifier($field) . ' = ' . $this->source->getConnection()->quote($value);
@@ -75,7 +75,9 @@ class MatchedRows extends BaseSampler
         }
 
         try {
-            $statement = $this->source->getConnection()->executeQuery($query);
+            foreach ($this->source->getConnection()->iterateAssociative($query) as $row) {
+                yield $row;
+            }
         } catch (TableNotFoundException $exception) {
             throw new TableNotFound(
                 sprintf(
@@ -86,7 +88,5 @@ class MatchedRows extends BaseSampler
                 $exception
             );
         }
-
-        return $statement->fetchAllAssociative();
     }
 }

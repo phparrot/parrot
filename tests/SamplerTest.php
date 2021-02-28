@@ -19,7 +19,7 @@ class SamplerTest extends SqliteBasedTestCase
             $this->source,
             'test_table_name'
         );
-        $this->assertSame([], $sampler->getRows());
+        $this->assertSame([], iterator_to_array($sampler->getRows()));
     }
 
     public function testCopyAllSampler(): void
@@ -30,7 +30,7 @@ class SamplerTest extends SqliteBasedTestCase
             $this->source,
             'fruits'
         );
-        $this->assertCount(4, $sampler->getRows());
+        $this->assertCount(4, iterator_to_array($sampler->getRows()));
     }
 
     public function testCopyAllWithReferenceStore(): void
@@ -44,7 +44,7 @@ class SamplerTest extends SqliteBasedTestCase
             'fruits'
         );
 
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
 
         $this->assertCount(4, $referenceStore->getReferencesByName('fruit_ids'));
     }
@@ -66,9 +66,8 @@ class SamplerTest extends SqliteBasedTestCase
             'where' => ['basket_id > 1']
         ];
         $sampler = $this->generateMatched((object)$config);
-        $sampler->getRows();
 
-        $this->assertCount(2, $sampler->getRows());
+        $this->assertCount(2, iterator_to_array($sampler->getRows()));
     }
 
     public function testMatchedWhereNoConstraints(): void
@@ -85,6 +84,6 @@ class SamplerTest extends SqliteBasedTestCase
     {
         $sampler = $this->generateMatched((object)[]);
         self::expectException(RequiredConfigurationValueNotProvided::class);
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 }

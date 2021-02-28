@@ -25,7 +25,7 @@ class NewestByIdTest extends SamplerTest
         $this->assertEquals([[
             'id' => 4,
             'name' => 'cherry'
-        ]], $sampler->getRows());
+        ]], iterator_to_array($sampler->getRows()));
     }
 
     public function testAnExceptionIsThrownIfTableDoesNotExist(): void
@@ -43,7 +43,7 @@ class NewestByIdTest extends SamplerTest
 
         $this->expectException(TableNotFound::class);
         $this->expectExceptionMessage('Table TABLE_THAT_DOES_NOT_EXIST does not exist');
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 
     public function testAnExceptionIsThrownIfQuantityParameterIsNotProvided(): void
@@ -60,7 +60,7 @@ class NewestByIdTest extends SamplerTest
 
         $this->expectException(RequiredConfigurationValueNotProvided::class);
         $this->expectExceptionMessage('The required parameter \'quantity\' was not provided');
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 
     public function testAnExceptionIsThrownIfIdFieldParameterIsNotProvided(): void
@@ -77,6 +77,6 @@ class NewestByIdTest extends SamplerTest
 
         $this->expectException(RequiredConfigurationValueNotProvided::class);
         $this->expectExceptionMessage('The required parameter \'idField\' was not provided');
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 }
