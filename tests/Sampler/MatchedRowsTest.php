@@ -36,7 +36,7 @@ class MatchedRowsTest extends SamplerTest
                     'name' => 'apple'
                 ]
             ],
-            $sampler->getRows()
+            iterator_to_array($sampler->getRows())
         );
     }
 
@@ -68,7 +68,7 @@ class MatchedRowsTest extends SamplerTest
                     'name' => 'cherry'
                 ]
             ],
-            $sampler->getRows()
+            iterator_to_array($sampler->getRows())
         );
     }
 
@@ -90,7 +90,7 @@ class MatchedRowsTest extends SamplerTest
             'fruits'
         );
 
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
 
         $this->assertSame([
             '1', '2', '3', '4'
@@ -113,7 +113,7 @@ class MatchedRowsTest extends SamplerTest
             'fruits'
         );
 
-        $results = $sampler->getRows();
+        $results = iterator_to_array($sampler->getRows());
 
         $this->assertEquals([
             [
@@ -142,6 +142,6 @@ class MatchedRowsTest extends SamplerTest
 
         $this->expectException(TableNotFound::class);
         $this->expectExceptionMessage('Table TABLE_THAT_DOES_NOT_EXIST does not exist');
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 }

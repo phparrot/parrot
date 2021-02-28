@@ -24,6 +24,6 @@ class NoneTest extends TestCase
             'TABLE_THAT_DOES_NOT_EXIST'
         );
 
-        $this->assertSame([], $sampler->getRows());
+        $this->assertSame([], iterator_to_array($sampler->getRows()));
     }
 }

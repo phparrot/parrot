@@ -14,8 +14,10 @@ class None extends BaseSampler
         return 'None';
     }
 
-    public function fetchData(): array
+    public function fetchData(): \Generator
     {
-        return [];
+        foreach([] as $value) {
+            yield $value;
+        }
     }
 }

@@ -14,7 +14,7 @@ class NewestById extends BaseSampler
         return 'NewestById';
     }
 
-    public function fetchData(): array
+    public function fetchData(): \Generator
     {
         if (!isset($this->config->idField)) {
             throw new RequiredConfigurationValueNotProvided('The required parameter \'idField\' was not provided');
@@ -32,7 +32,10 @@ class NewestById extends BaseSampler
                 $this->config->quantity
             );
 
-            $statement = $this->source->getConnection()->executeQuery($query);
+            foreach ($this->source->getConnection()->iterateAssociative($query) as $row) {
+                yield $row;
+            }
+
         } catch (TableNotFoundException $exception) {
             throw new TableNotFound(
                 sprintf(
@@ -43,7 +46,5 @@ class NewestById extends BaseSampler
                 $exception
             );
         }
-
-        return $statement->fetchAllAssociative();
     }
 }

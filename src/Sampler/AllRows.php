@@ -13,16 +13,18 @@ class AllRows extends BaseSampler
         return 'All';
     }
 
-    public function fetchData(): array
+    public function fetchData(): \Generator
     {
-        $query = "SELECT * FROM " . $this->source->getConnection()->quote($this->tableName);
+        $query = "SELECT * FROM " . $this->source->getConnection()->quoteIdentifier($this->tableName);
 
         if ($this->limit) {
             $query .= " LIMIT " . $this->limit;
         }
 
         try {
-            $statement = $this->source->getConnection()->executeQuery($query);
+            foreach ($this->source->getConnection()->iterateAssociative($query) as $row) {
+                yield $row;
+            }
         } catch (TableNotFoundException $exception) {
             throw new TableNotFound(
                 sprintf(
@@ -33,7 +35,5 @@ class AllRows extends BaseSampler
                 $exception
             );
         }
-
-        return $statement->fetchAllAssociative();
     }
 }

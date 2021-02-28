@@ -17,7 +17,7 @@ class AllRowsTest extends SamplerTest
             'fruits'
         );
 
-        $this->assertSame(4, count($sampler->getRows()));
+        $this->assertSame(4, count(iterator_to_array($sampler->getRows())));
     }
 
     public function testRowsAreFiltered(): void
@@ -33,7 +33,7 @@ class AllRowsTest extends SamplerTest
             'fruits'
         );
 
-        $this->assertSame(2, count($sampler->getRows()));
+        $this->assertSame(2, count(iterator_to_array($sampler->getRows())));
     }
 
     public function testAnExceptionIsThrownIfTableDoesNotExist(): void
@@ -47,6 +47,6 @@ class AllRowsTest extends SamplerTest
 
         $this->expectException(TableNotFound::class);
         $this->expectExceptionMessage('Table TABLE_THAT_DOES_NOT_EXIST does not exist');
-        $sampler->getRows();
+        iterator_to_array($sampler->getRows());
     }
 }
